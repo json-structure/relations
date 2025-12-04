@@ -8,14 +8,14 @@ number:
 date: 2025-12-04
 consensus: true
 v: 3
-area: "Applications"
-workgroup: "JavaScript Object Notation"
+area: Web and Internet Transport
+workgroup: Building Blocks for HTTP APIs
 keyword: Internet-Draft
 venue:
-  group: "JavaScript Object Notation"
-  type: "Working Group"
-  mail: "json@ietf.org"
-  arch: "https://mailarchive.ietf.org/arch/browse/json"
+  group: TBD
+  type: Working Group
+  mail: TBD
+  arch: TBD
   github: "json-structure/relations"
   latest: "https://json-structure.github.io/relations/draft-vasters-json-structure-relations.html"
 
