@@ -8,14 +8,14 @@ number:
 date: 2025-11-28
 consensus: true
 v: 3
-area: Web and Internet Transport
-workgroup: Building Blocks for HTTP APIs
+area: "Applications"
+workgroup: "JavaScript Object Notation"
 keyword: Internet-Draft
 venue:
-  group: TBD
-  type: Working Group
-  mail: TBD
-  arch: TBD
+  group: "JavaScript Object Notation"
+  type: "Working Group"
+  mail: "json@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/json"
   github: "json-structure/relations"
   latest: "https://json-structure.github.io/relations/draft-vasters-json-structure-relations.html"
 
@@ -99,7 +99,7 @@ Identity scopes MAY be:
 The specific identity scope is determined by the `scope` keyword in the relation
 declaration. When `scope` is present, it identifies where in the document
 instances of the target type can be found. When `scope` is absent, the identity
-scope extends beyond the document to external data sources. 
+scope extends beyond the document to external data sources.
 
 Example:
 
