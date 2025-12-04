@@ -5,7 +5,7 @@ category: std
 docname: draft-vasters-json-structure-relations-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-11-28
+date: 2025-12-04
 consensus: true
 v: 3
 area: "Applications"
