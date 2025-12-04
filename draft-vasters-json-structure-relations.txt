@@ -1,0 +1,742 @@
+
+
+
+
+Building Blocks for HTTP APIs                                 C. Vasters
+Internet-Draft                                     Microsoft Corporation
+Intended status: Standards Track                        28 November 2025
+Expires: 1 June 2026
+
+
+                       JSON Structure: Relations
+             draft-vasters-json-structure-relations-latest
+
+Abstract
+
+   This document is an extension to JSON Structure Core.  It defines
+   keywords for modeling relationships and associations between objects
+   in JSON Structure schemas, including the identity, relations,
+   targettype, cardinality, scope, and qualifiertype keywords.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://json-
+   structure.github.io/relations/draft-vasters-json-structure-
+   relations.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-vasters-json-structure-
+   relations/.
+
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/json-structure/relations.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 1 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions
+   3.  Identity
+     3.1.  The identity Keyword
+   4.  Relations
+     4.1.  The relations Keyword
+     4.2.  The targettype Keyword
+     4.3.  The cardinality Keyword
+     4.4.  The scope Keyword
+     4.5.  The qualifiertype Keyword
+   5.  Relation Instance Structure
+     5.1.  Single-Cardinality Relations
+     5.2.  Multiple-Cardinality Relations
+     5.3.  Identity Values
+     5.4.  Reference Resolution
+   6.  Complete Example
+   7.  Reserved Keywords
+   8.  Security Considerations
+   9.  IANA Considerations
+   10. Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   This document is an extension to JSON Structure Core [JSTRUCT-CORE].
+   It defines keywords for modeling relationships and associations
+   between objects in JSON Structure schemas.
+
+   In many data models, objects need to reference other objects to
+   express relationships such as authorship, ownership, membership, or
+   other associations.  This specification provides a structured way to
+   declare such relationships within JSON Structure schemas.
+
+   The key concepts introduced are:
+
+   *  *Identity*: A mechanism for uniquely identifying object instances
+      based on one or more property values.
+
+   *  *Relations*: Declarations that specify how one object type relates
+      to another, including cardinality and optional qualifiers.
+
+2.  Conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Identity
+
+   The identity keyword is used to declare which properties of an object
+   or tuple uniquely identify instances of that type.  The identity
+   declaration functions similarly to a primary key in relational
+   databases.
+
+3.1.  The identity Keyword
+
+   The identity keyword MUST be used only with schemas of type object or
+   tuple.  Its value MUST be an array of strings, where each string is
+   the name of a property defined in the properties map of the type.
+
+   When an object type has an identity declaration, any instance of that
+   type MUST be uniquely identified by the combination of its identity
+   property values.  Two instances with the same identity values MUST
+   NOT exist within the same identity scope.
+
+   An identity scope is the boundary within which identity values must
+   be unique.  Identity scopes MAY be:
+
+   *  A collection within a document, such as an array, set, or map
+      containing instances of the type.
+
+   *  An entire document when instances are distributed across multiple
+      collections.
+
+   *  An external data source, such as a database or service, when the
+      identity property is used to reference instances that exist
+      outside the current document.
+
+   The specific identity scope is determined by the scope keyword in the
+   relation declaration.  When scope is present, it identifies where in
+   the document instances of the target type can be found.  When scope
+   is absent, the identity scope extends beyond the document to external
+   data sources.
+
+   Example:
+
+   {
+     "Author": {
+       "type": "object",
+       "properties": {
+         "id": { "type": "uuid" },
+         "name": { "type": "string" }
+       },
+       "required": ["id", "name"],
+       "identity": ["id"]
+     }
+   }
+
+   For objects with composite identities, multiple properties can be
+   specified:
+
+   {
+     "BookEdition": {
+       "type": "object",
+       "properties": {
+         "isbn": { "type": "string" },
+         "edition": { "type": "int32" },
+         "title": { "type": "string" }
+       },
+       "required": ["isbn", "edition", "title"],
+       "identity": ["isbn", "edition"]
+     }
+   }
+
+4.  Relations
+
+   The relations keyword is used to declare relationship properties on
+   object and tuple types.  Relations express associations between
+   instances of different types.
+
+4.1.  The relations Keyword
+
+   The relations keyword MUST only be used with schemas of type object
+   or tuple.  Its value MUST be a JSON object where each key is a
+   relation name and each value is a relation declaration.
+
+   Relation names MUST conform to the same identifier rules as property
+   names in JSON Structure Core.  The relations and properties keywords
+   share a namespace, meaning a relation name MUST NOT conflict with any
+   property name in the same type.
+
+   A relation declaration is a JSON object that defines the
+   characteristics of the relationship.  It MUST contain the following
+   properties:
+
+   *  targettype: Declares the target type that the relation refers to.
+
+   *  cardinality: Declares whether the relationship points to one or
+      more targets (single or multiple).
+
+   A relation declaration MAY contain:
+
+   *  scope: Specifies where instances of the target type can be found
+      within the document.
+
+   *  qualifiertype: Defines a type to qualify the relationship with
+      additional properties (similar to link properties in graph
+      models).
+
+   Example:
+
+   {
+     "definitions": {
+       "Author": {
+         "type": "object",
+         "properties": {
+           "id": { "type": "uuid" },
+           "name": { "type": "string" }
+         },
+         "required": ["id", "name"],
+         "identity": ["id"]
+       },
+       "Book": {
+         "type": "object",
+         "properties": {
+           "isbn": { "type": "string" },
+           "title": { "type": "string" }
+         },
+         "required": ["isbn", "title"],
+         "identity": ["isbn"],
+         "relations": {
+           "authors": {
+             "cardinality": "multiple",
+             "targettype": { "$ref": "#/definitions/Author" }
+           }
+         }
+       }
+     }
+   }
+
+4.2.  The targettype Keyword
+
+   The targettype keyword specifies the target type of a relation.  Its
+   value MUST be a schema containing a $ref keyword that points to a
+   type definition with an identity declaration.
+
+   The target type MUST have an identity declaration.  This identity is
+   used to establish references between instances.
+
+   Example:
+
+   {
+     "targettype": { "$ref": "#/definitions/Author" }
+   }
+
+4.3.  The cardinality Keyword
+
+   The cardinality keyword specifies whether a relation points to a
+   single target or multiple targets.  Its value MUST be one of the
+   following strings:
+
+   *  "single": The relation refers to exactly one target instance.
+
+   *  "multiple": The relation refers to zero or more target instances.
+
+   Example for a single-cardinality relation:
+
+   {
+     "publisher": {
+       "cardinality": "single",
+       "targettype": { "$ref": "#/definitions/Publisher" }
+     }
+   }
+
+   Example for a multiple-cardinality relation:
+
+   {
+     "authors": {
+       "cardinality": "multiple",
+       "targettype": { "$ref": "#/definitions/Author" }
+     }
+   }
+
+4.4.  The scope Keyword
+
+   The scope keyword specifies where instances of the target type can be
+   found within an instance document.  When present, it indicates that
+   the relation references objects contained in the current document.
+   When absent, the relation references objects that exist in an
+   external context, such as a database, service, or another document.
+
+   The value of scope MUST be either:
+
+   *  A string containing a JSON Pointer ([RFC6901]) to a schema
+      location, or
+
+   *  An array of strings, each containing a JSON Pointer to a schema
+      location.
+
+   Each JSON Pointer MUST reference a valid location within the same
+   schema document.  The referenced location MUST be one of the
+   following:
+
+   *  A property definition within a type whose value is an array, set,
+      or map containing items compatible with targettype.  For example:
+      #/definitions/Library/properties/authors.
+
+   *  The document root type (as declared by $root) if the root type is
+      an array, set, or map containing items compatible with targettype.
+      In this case, the scope value is # (pointing to the root).
+
+   The referenced type is considered compatible with targettype if the
+   items type (for array or set) or values type (for map) matches
+   targettype or is a subtype of targettype.
+
+   When resolving a relation at runtime, the application uses the scope
+   to identify which collections in the document instance contain
+   potential target objects.  The application then searches these
+   collections for an object whose identity matches the identity value
+   in the relation instance.  For map types, the application searches
+   the map's values, not its keys.
+
+   Example with a single scope pointing to a property:
+
+   {
+     "definitions": {
+       "Library": {
+         "type": "object",
+         "properties": {
+           "authors": {
+             "type": "array",
+             "items": { "$ref": "#/definitions/Author" }
+           },
+           "books": {
+             "type": "array",
+             "items": { "$ref": "#/definitions/Book" }
+           }
+         }
+       },
+       "Author": {
+         "type": "object",
+         "properties": {
+           "id": { "type": "uuid" },
+           "name": { "type": "string" }
+         },
+         "identity": ["id"]
+       },
+       "Book": {
+         "type": "object",
+         "properties": {
+           "isbn": { "type": "string" },
+           "title": { "type": "string" }
+         },
+         "identity": ["isbn"],
+         "relations": {
+           "authors": {
+             "cardinality": "multiple",
+             "targettype": { "$ref": "#/definitions/Author" },
+             "scope": "#/definitions/Library/properties/authors"
+           }
+         }
+       }
+     }
+   }
+
+   Example with multiple scopes:
+
+   {
+     "relations": {
+       "contributors": {
+         "cardinality": "multiple",
+         "targettype": { "$ref": "#/definitions/Person" },
+         "scope": [
+           "#/definitions/Project/properties/teamMembers",
+           "#/definitions/Project/properties/externalContributors"
+         ]
+       }
+     }
+   }
+
+   Example of an external relation (no scope):
+
+   {
+     "relations": {
+       "customer": {
+         "cardinality": "single",
+         "targettype": { "$ref": "#/definitions/Customer" }
+       }
+     }
+   }
+
+   In this example, the absence of scope indicates that Customer
+   instances are not expected to be found in the document.  The
+   application must resolve the reference through external means.
+
+4.5.  The qualifiertype Keyword
+
+   The qualifiertype keyword allows a relation to carry additional
+   properties that qualify the relationship itself, similar to link
+   properties in graph databases.
+
+   The value of qualifiertype MUST be a reference to a reusable type
+   using the $ref keyword.
+
+   Example:
+
+   {
+     "definitions": {
+       "Person": {
+         "type": "object",
+         "properties": {
+           "id": { "type": "uuid" },
+           "name": { "type": "string" }
+         },
+         "required": ["id", "name"],
+         "identity": ["id"]
+       },
+       "ContributorQualifier": {
+         "type": "object",
+         "properties": {
+           "role": { "type": "string" },
+           "startDate": { "type": "date" },
+           "endDate": { "type": "date" }
+         },
+         "required": ["role"]
+       },
+       "Project": {
+         "type": "object",
+         "properties": {
+           "projectId": { "type": "string" },
+           "name": { "type": "string" }
+         },
+         "required": ["projectId", "name"],
+         "identity": ["projectId"],
+         "relations": {
+           "contributors": {
+             "cardinality": "multiple",
+             "targettype": { "$ref": "#/definitions/Person" },
+             "qualifiertype": { "$ref": "#/definitions/ContributorQualifier" }
+           }
+         }
+       }
+     }
+   }
+
+5.  Relation Instance Structure
+
+   In JSON document instances, relations are represented as properties
+   of the containing object.  The structure of a relation instance
+   depends on its cardinality.
+
+5.1.  Single-Cardinality Relations
+
+   A single-cardinality relation is represented as a JSON object with
+   the following properties:
+
+   *  identity: A value or tuple of values that match the identity of
+      the target object.
+
+   If the relation has a qualifiertype, the qualifier properties are
+   included in a qualifier property within the relation object.
+
+   Example:
+
+   {
+     "isbn": "978-0-123456-78-9",
+     "title": "Example Book",
+     "publisher": {
+       "identity": "550e8400-e29b-41d4-a716-446655440000"
+     }
+   }
+
+   With qualifier properties:
+
+   {
+     "isbn": "978-0-123456-78-9",
+     "title": "Example Book",
+     "editor": {
+       "identity": "650e8400-e29b-41d4-a716-446655440001",
+       "qualifier": {
+         "role": "Chief Editor",
+         "startDate": "2020-01-15"
+       }
+     }
+   }
+
+5.2.  Multiple-Cardinality Relations
+
+   A multiple-cardinality relation is represented as a JSON array.  Each
+   element of the array is a relation object with the same structure as
+   a single-cardinality relation.
+
+   Example:
+
+   {
+     "isbn": "978-0-123456-78-9",
+     "title": "Example Book",
+     "authors": [
+       { "identity": "123e4567-e89b-12d3-a456-426614174000" },
+       { "identity": "223e4567-e89b-12d3-a456-426614174001" }
+     ]
+   }
+
+   With qualifier properties:
+
+   {
+     "projectId": "proj-123",
+     "name": "Example Project",
+     "contributors": [
+       {
+         "identity": "323e4567-e89b-12d3-a456-426614174002",
+         "qualifier": {
+           "role": "Developer",
+           "startDate": "2020-06-01"
+         }
+       },
+       {
+         "identity": "423e4567-e89b-12d3-a456-426614174003",
+         "qualifier": {
+           "role": "Designer",
+           "startDate": "2020-06-15",
+           "endDate": "2021-12-31"
+         }
+       }
+     ]
+   }
+
+5.3.  Identity Values
+
+   The identity property in a relation object contains the identity
+   value(s) of the target object.
+
+   *  If the target type's identity declaration specifies a single
+      property, the identity value is a scalar matching that property's
+      type.
+
+   *  If the target type's identity declaration specifies multiple
+      properties (composite identity), the identity value is a JSON
+      array containing the values in the same order as declared in the
+      identity keyword.
+
+   Example with single-property identity:
+
+   {
+     "identity": "550e8400-e29b-41d4-a716-446655440000"
+   }
+
+   Example with composite identity:
+
+   {
+     "identity": ["978-0-123456-78-9", 2]
+   }
+
+5.4.  Reference Resolution
+
+   A relationship is established through the identity property in a
+   relation instance, which contains the identity value(s) of the target
+   object.
+
+   The resolution mechanism depends on whether the relation declaration
+   includes a scope:
+
+   *  *With scope*: The application uses the schema pointers in scope to
+      identify the corresponding collections in the document instance.
+      It searches these collections for an object whose identity matches
+      the identity value.  For map collections, the search is performed
+      on the map's values.
+
+   *  *Without scope*: The relation references an object that exists
+      outside the document.  The application must resolve the reference
+      through external means, such as querying a database or service.
+
+6.  Complete Example
+
+   This example demonstrates a library schema with books and authors:
+
+   {
+     "$schema": "https://json-structure.org/meta/core/v0/#",
+     "$id": "https://example.com/library",
+     "$root": "#/definitions/Library",
+     "definitions": {
+       "Library": {
+         "type": "object",
+         "properties": {
+           "name": { "type": "string" },
+           "authors": {
+             "type": "array",
+             "items": { "$ref": "#/definitions/Author" }
+           },
+           "books": {
+             "type": "array",
+             "items": { "$ref": "#/definitions/Book" }
+           }
+         },
+         "required": ["name", "authors", "books"]
+       },
+       "Author": {
+         "type": "object",
+         "properties": {
+           "id": { "type": "uuid" },
+           "name": { "type": "string" }
+         },
+         "required": ["id", "name"],
+         "identity": ["id"]
+       },
+       "Book": {
+         "type": "object",
+         "properties": {
+           "isbn": { "type": "string" },
+           "title": { "type": "string" }
+         },
+         "required": ["isbn", "title"],
+         "identity": ["isbn"],
+         "relations": {
+           "authors": {
+             "cardinality": "multiple",
+             "targettype": { "$ref": "#/definitions/Author" },
+             "scope": "#/definitions/Library/properties/authors"
+           }
+         }
+       }
+     }
+   }
+
+   Example instance document:
+
+   {
+     "$schema": "https://example.com/library",
+     "name": "City Central Library",
+     "authors": [
+       {
+         "id": "123e4567-e89b-12d3-a456-426614174000",
+         "name": "Alice Smith"
+       },
+       {
+         "id": "223e4567-e89b-12d3-a456-426614174001",
+         "name": "Bob Jones"
+       }
+     ],
+     "books": [
+       {
+         "isbn": "978-0-123456-78-9",
+         "title": "The Great Novel",
+         "authors": [
+           { "identity": "123e4567-e89b-12d3-a456-426614174000" }
+         ]
+       },
+       {
+         "isbn": "978-0-987654-32-1",
+         "title": "Another Great Book",
+         "authors": [
+           { "identity": "123e4567-e89b-12d3-a456-426614174000" },
+           { "identity": "223e4567-e89b-12d3-a456-426614174001" }
+         ]
+       }
+     ]
+   }
+
+7.  Reserved Keywords
+
+   This specification adds the following keywords to the JSON Structure
+   reserved keyword list:
+
+   *  identity
+
+   *  relations
+
+   *  targettype
+
+   *  cardinality
+
+   *  scope
+
+   *  qualifiertype
+
+8.  Security Considerations
+
+   Relations create references between objects that may span different
+   parts of a document or different documents.  Implementations MUST
+   ensure that:
+
+   *  Identity values are validated against the expected target type.
+
+   *  Circular references are handled appropriately to prevent infinite
+      loops during traversal.
+
+   *  Identity matching across documents does not expose sensitive
+      information through unintended correlations.
+
+9.  IANA Considerations
+
+   This document has no IANA actions.
+
+10.  Normative References
+
+   [JSTRUCT-CORE]
+              Vasters, C., "JSON Structure Core", n.d., <https://json-
+              structure.github.io/core/draft-vasters-json-structure-
+              core.html>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC6901]  Bryan, P., Ed., Zyp, K., and M. Nottingham, Ed.,
+              "JavaScript Object Notation (JSON) Pointer", RFC 6901,
+              DOI 10.17487/RFC6901, April 2013,
+              <https://www.rfc-editor.org/rfc/rfc6901>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+   [RFC9562]  Davis, K., Peabody, B., and P. Leach, "Universally Unique
+              IDentifiers (UUIDs)", RFC 9562, DOI 10.17487/RFC9562, May
+              2024, <https://www.rfc-editor.org/rfc/rfc9562>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Clemens Vasters
+   Microsoft Corporation
+   Email: clemensv@microsoft.com
