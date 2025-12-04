@@ -2,7 +2,7 @@
 
 
 
-JavaScript Object Notation                                    C. Vasters
+Building Blocks for HTTP APIs                                 C. Vasters
 Internet-Draft                                     Microsoft Corporation
 Intended status: Standards Track                         4 December 2025
 Expires: 7 June 2026
@@ -28,10 +28,6 @@ About This Document
    https://datatracker.ietf.org/doc/draft-vasters-json-structure-
    relations/.
 
-   Discussion of this document takes place on the JavaScript Object
-   Notation Working Group mailing list (mailto:json@ietf.org), which is
-   archived at https://mailarchive.ietf.org/arch/browse/json.  Subscribe
-   at https://www.ietf.org/mailman/listinfo/json/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/json-structure/relations.
