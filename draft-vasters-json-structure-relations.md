@@ -665,6 +665,13 @@ This document has no IANA actions.
 
 --- back
 
+# Changes from draft-vasters-json-structure-relations-00
+{:numbered="false"}
+
+- Added missing BCP 14 references (RFC 2119, RFC 8174).
+- Improved phrasing of identity keyword description.
+- Fixed modal placement: "MUST only be used" → "MUST be used only".
+
 # Acknowledgments
 {:numbered="false"}
 
