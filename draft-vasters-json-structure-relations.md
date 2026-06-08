@@ -26,7 +26,9 @@ author:
     email: clemensv@microsoft.com
 
 normative:
+  RFC2119:
   RFC6901:
+  RFC8174:
   RFC8259:
   RFC9562:
   JSTRUCT-CORE:
@@ -72,8 +74,8 @@ The key concepts introduced are:
 # Identity {#identity}
 
 The `identity` keyword is used to declare which properties of an object or tuple
-uniquely identify instances of that type. The identity declaration functions
-similarly to a primary key in relational databases.
+uniquely identify instances of that type. The identity declaration serves much
+like a primary key in a relational database.
 
 ## The `identity` Keyword {#identity-keyword}
 
@@ -142,7 +144,7 @@ types.
 
 ## The `relations` Keyword {#relations-keyword}
 
-The `relations` keyword MUST only be used with schemas of type `object` or
+The `relations` keyword MUST be used only with schemas of type `object` or
 `tuple`. Its value MUST be a JSON object where each key is a relation name and
 each value is a relation declaration.
 
