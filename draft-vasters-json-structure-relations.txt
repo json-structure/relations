@@ -85,6 +85,7 @@ Table of Contents
    8.  Security Considerations
    9.  IANA Considerations
    10. Normative References
+   Changes from draft-vasters-json-structure-relations-00
    Acknowledgments
    Author's Address
 
@@ -729,6 +730,14 @@ Table of Contents
    [RFC9562]  Davis, K., Peabody, B., and P. Leach, "Universally Unique
               IDentifiers (UUIDs)", RFC 9562, DOI 10.17487/RFC9562, May
               2024, <https://www.rfc-editor.org/rfc/rfc9562>.
+
+Changes from draft-vasters-json-structure-relations-00
+
+   *  Added missing BCP 14 references (RFC 2119, RFC 8174).
+
+   *  Improved phrasing of identity keyword description.
+
+   *  Fixed modal placement: "MUST only be used" → "MUST be used only".
 
 Acknowledgments
 
