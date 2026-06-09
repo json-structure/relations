@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-07T02:02:03.019926+00:00",
+  "timestamp": "2026-06-09T01:45:06.165379+00:00",
   "repo": "json-structure/relations",
   "labels": [
     {
@@ -49,6 +49,80 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
-  "pulls": []
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOQiaXn88AAAABEs8cBQ",
+      "title": "Editorial: missing BCP 14 references, phrasing improvements",
+      "url": "https://github.com/json-structure/relations/issues/1",
+      "state": "CLOSED",
+      "author": "clemensv",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The following minor editorial issues were found during review:\n\n### 1. Missing BCP 14 references (RFC2119, RFC8174)\n\nThe document uses RFC 2119 keywords (MUST, MAY, etc.) but does not list `RFC2119` and `RFC8174` in the normative references. These should be added.\n\n### 2. Awkward phrasing in identity description\n\n> The identity declaration functions similarly to a primary key in relational databases.\n\nSuggested: \"The identity declaration serves much like a primary key in a relational database.\"\n\n### 3. Modal placement: \"MUST only be used\"\n\n> The `relations` keyword MUST only be used with schemas of type `object` or `tuple`.\n\nPer RFC style convention, prefer \"MUST be used only with\u2026\" for clearer scoping of the restriction.",
+      "createdAt": "2026-06-08T06:28:01Z",
+      "updatedAt": "2026-06-08T08:55:08Z",
+      "closedAt": "2026-06-08T08:55:08Z",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 2,
+      "id": "PR_kwDOQiaXn87j0PJ2",
+      "title": "Editorial: add BCP 14 references and improve phrasing",
+      "url": "https://github.com/json-structure/relations/pull/2",
+      "state": "MERGED",
+      "author": "clemensv",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- Add RFC2119 and RFC8174 to normative references (required for MUST/MAY keyword usage)\n- Improve phrasing of identity keyword description\n- Fix modal placement: 'MUST only be used' \u2192 'MUST be used only'\n\nFixes #1",
+      "createdAt": "2026-06-08T08:28:57Z",
+      "updatedAt": "2026-06-08T08:55:07Z",
+      "baseRepository": "json-structure/relations",
+      "baseRefName": "main",
+      "baseRefOid": "d89490ab588ed5de0add460601a03de11017232c",
+      "headRepository": "json-structure/relations",
+      "headRefName": "editorial/add-bcp14-refs-and-phrasing",
+      "headRefOid": "0b08ab58579ef976541b80138bc8190a3affa3b7",
+      "closedAt": "2026-06-08T08:55:07Z",
+      "mergedAt": "2026-06-08T08:55:06Z",
+      "mergedBy": "clemensv",
+      "mergeCommit": {
+        "oid": "091e2af7f85c3e4baec962f0f4411ebe0b37d880"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOQiaXn87j2ZKe",
+      "title": "Add changes section for draft-01",
+      "url": "https://github.com/json-structure/relations/pull/3",
+      "state": "MERGED",
+      "author": "clemensv",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Adds the changes section documenting updates since draft-vasters-json-structure-relations-00.",
+      "createdAt": "2026-06-08T10:02:17Z",
+      "updatedAt": "2026-06-08T15:22:42Z",
+      "baseRepository": "json-structure/relations",
+      "baseRefName": "main",
+      "baseRefOid": "091e2af7f85c3e4baec962f0f4411ebe0b37d880",
+      "headRepository": "json-structure/relations",
+      "headRefName": "editorial/add-changes-section",
+      "headRefOid": "5c566b4fa10ee355b8e3996c92b87a0aaf0f4aed",
+      "closedAt": "2026-06-08T15:22:42Z",
+      "mergedAt": "2026-06-08T15:22:42Z",
+      "mergedBy": "clemensv",
+      "mergeCommit": {
+        "oid": "3e30a48efa0d0a44fe7a245ab3a2dcc9896443f2"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
