@@ -1,4 +1,4 @@
-<!-- regenerate: on (set to off if you edit this file) -->
+<!-- regenerate: off (set to off if you edit this file) -->
 
 # JSON Structure: Relations
 
@@ -17,6 +17,36 @@ See the
 
 The contributing file also has tips on how to make contributions, if you
 don't already know how to do that.
+
+## Samples
+
+Fourteen worked examples live in
+[`samples/relations/`](https://github.com/json-structure/primer-and-samples/tree/main/samples/relations)
+in the [primer-and-samples](https://github.com/json-structure/primer-and-samples)
+repository. Each directory contains a `schema.struct.json` that declares the
+extension meta-schema [`relations-v0.json`](relations-v0.json) and an
+`example.json` instance that conforms to it.
+
+Twelve teaching samples introduce the keywords one at a time: single and
+composite identity, identity on a tuple type, both cardinalities, qualified
+relations, scopes over arrays, maps, sets, several collections at once and the
+document root, self-relations, and relations left unscoped because the target
+lives in another system. Two real-world samples — a lending library catalogue
+and an order book — put the whole set to work at once. All fourteen are
+catalogued in the
+[samples README](https://github.com/json-structure/primer-and-samples/blob/main/samples/relations/README.md).
+
+The tooling stays here. Run
+[`samples/validate-samples.ps1`](samples/validate-samples.ps1) to check the
+meta-schema, every sample schema, every instance, and every relation; it expects
+`json-structure/primer-and-samples` to be checked out beside this repository.
+
+The relation check is the one a schema validator cannot make. A validator sees
+one node at a time, so it can confirm that `cardinality` is one of two words and
+that `targettype` resolves, but not that the target carries an identity, that a
+scope holds the right type, or that an identity in an instance finds anything.
+[`samples/check-relations.py`](samples/check-relations.py) makes those checks on
+both the schema and the instance.
 
 ## Command Line Usage
 
