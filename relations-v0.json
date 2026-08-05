@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-structure.org/meta/extended/v0/#",
+  "$id": "https://json-structure.org/meta/relations/v0/#",
+  "$import": "https://json-structure.org/meta/extended/v0/#",
+  "$uses": [
+    "JSONStructureImport"
+  ],
+  "$offers": {
+    "JSONStructureRelations": [
+      "#/definitions/features/RelationsObjectAddIn",
+      "#/definitions/features/RelationsTupleAddIn"
+    ]
+  },
+  "$root": "#/definitions/SchemaDocument",
+  "name": "JSONStructureRelations",
+  "description": "Meta-schema for JSON Structure: Relations. It validates the shape of the keywords defined by that specification: the types on which 'identity' and 'relations' may appear, the form of a relation declaration, the members that declaration requires and permits, and the cardinality enumeration the specification states is closed. Rules whose subject lies outside the annotated node cannot be expressed here and remain the validator's responsibility: that a target type carries an identity declaration, that a scope pointer resolves to a collection compatible with the target type, and that a relation name does not collide with a property name of the same type.",
+  "definitions": {
+    "features": {
+      "RelationsObjectAddIn": {
+        "name": "RelationsObjectAddIn",
+        "abstract": true,
+        "description": "Identity and relation declarations carried on an object type definition.",
+        "$extends": "#/definitions/ObjectType",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "object"
+            ]
+          },
+          "identity": {
+            "type": {
+              "$ref": "#/definitions/relations/Identity"
+            },
+            "description": "Properties whose combined values uniquely identify an instance of the annotated type."
+          },
+          "relations": {
+            "type": {
+              "$ref": "#/definitions/relations/RelationMap"
+            },
+            "description": "Relationships the annotated type declares to other types."
+          }
+        }
+      },
+      "RelationsTupleAddIn": {
+        "name": "RelationsTupleAddIn",
+        "abstract": true,
+        "description": "Identity and relation declarations carried on a tuple type definition.",
+        "$extends": "#/definitions/TupleType",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "tuple"
+            ]
+          },
+          "identity": {
+            "type": {
+              "$ref": "#/definitions/relations/Identity"
+            },
+            "description": "Properties whose combined values uniquely identify an instance of the annotated type."
+          },
+          "relations": {
+            "type": {
+              "$ref": "#/definitions/relations/RelationMap"
+            },
+            "description": "Relationships the annotated type declares to other types."
+          }
+        }
+      }
+    },
+    "relations": {
+      "Identity": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Names of properties defined in the properties map of the annotated type. The combination of their values uniquely identifies an instance within its identity scope."
+      },
+      "RelationMap": {
+        "type": "map",
+        "values": {
+          "type": {
+            "$ref": "#/definitions/relations/Relation"
+          }
+        },
+        "description": "Relation declarations keyed by relation name. Relation names obey the identifier rules for property names and share a namespace with the properties of the same type."
+      },
+      "Relation": {
+        "type": "object",
+        "description": "A single relationship declared by the containing type.",
+        "properties": {
+          "targettype": {
+            "type": {
+              "$ref": "#/definitions/TypeReference"
+            },
+            "description": "Reference to the type the relation refers to. The referenced type carries an identity declaration."
+          },
+          "cardinality": {
+            "type": "string",
+            "enum": [
+              "single",
+              "multiple"
+            ],
+            "description": "Whether the relation refers to exactly one target instance, or to zero or more."
+          },
+          "scope": {
+            "type": [
+              "jsonpointer",
+              {
+                "$ref": "#/definitions/relations/ScopePointerArray"
+              }
+            ],
+            "description": "Location, or locations, within the schema document at which instances of the target type are found. Absent when the relation is resolved outside the document."
+          },
+          "qualifiertype": {
+            "type": {
+              "$ref": "#/definitions/TypeReference"
+            },
+            "description": "Reference to a type whose properties qualify the relationship itself."
+          }
+        },
+        "required": [
+          "targettype",
+          "cardinality"
+        ]
+      },
+      "ScopePointerArray": {
+        "type": "array",
+        "items": {
+          "type": "jsonpointer"
+        },
+        "description": "JSON Pointers to schema locations at which instances of the target type are found."
+      }
+    }
+  }
+}
