@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-09T01:45:06.165379+00:00",
+  "timestamp": "2026-08-06T01:09:46.488764+00:00",
   "repo": "json-structure/relations",
   "labels": [
     {
@@ -64,6 +64,22 @@
       "createdAt": "2026-06-08T06:28:01Z",
       "updatedAt": "2026-06-08T08:55:08Z",
       "closedAt": "2026-06-08T08:55:08Z",
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOQiaXn88AAAABLkh3uA",
+      "title": "Complete Example does not conform: wrong $schema, missing $uses, bare $ref in items",
+      "url": "https://github.com/json-structure/relations/issues/4",
+      "state": "OPEN",
+      "author": "clemensv",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The schema in [Complete Example](https://json-structure.github.io/relations/draft-vasters-json-structure-relations.html#name-complete-example) is not a conforming JSON Structure document. A reader who copies it gets five errors from the reference implementation, three of them on the very keywords the section exists to demonstrate.\r\n\r\n```\r\n$ json-structure-check --extended --allowimport library.struct.json\r\nSchema is invalid:\r\n - #/definitions/Library/properties/authors/items/$ref [SCHEMA_REF_NOT_IN_TYPE] '$ref' is only permitted inside the 'type' attribute. Use { \"type\": { \"$ref\": \"...\" } } instead of { \"$ref\": \"...\" }\r\n - #/definitions/Library/properties/books/items/$ref [SCHEMA_REF_NOT_IN_TYPE] '$ref' is only permitted inside the 'type' attribute. Use { \"type\": { \"$ref\": \"...\" } } instead of { \"$ref\": \"...\" }\r\n - #/definitions/Author/identity [SCHEMA_ERROR] 'identity' requires JSONStructureRelations extension.\r\n - #/definitions/Book/identity [SCHEMA_ERROR] 'identity' requires JSONStructureRelations extension.\r\n - #/definitions/Book/relations [SCHEMA_ERROR] 'relations' requires JSONStructureRelations extension.\r\n```\r\n\r\nThree separate defects:\r\n\r\n**1. `$schema` names the Core meta-schema.** The document is declared as\r\n\r\n```json\r\n\"$schema\": \"https://json-structure.org/meta/core/v0/#\"\r\n```\r\n\r\nbut it uses `identity` and `relations`, which Core does not define. It should name the extension meta-schema, `https://json-structure.org/meta/relations/v0/#`.\r\n\r\n**2. `$uses` is absent.** Relations keywords are contributed by an add-in and have to be activated:\r\n\r\n```json\r\n\"$uses\": [\"JSONStructureRelations\"]\r\n```\r\n\r\nWithout it a validator rejects `identity` and `relations` even when `$schema` is correct. This is the point most likely to trip up a first-time reader, because nothing else in the document hints that the keywords need switching on, and no other section of the draft shows `$uses` in context.\r\n\r\n**3. `items` carries a bare `$ref`.** Both collections are written\r\n\r\n```json\r\n\"items\": { \"$ref\": \"#/definitions/Author\" }\r\n```\r\n\r\nCore requires `items` to hold a type declaration, so the reference belongs under `type`:\r\n\r\n```json\r\n\"items\": { \"type\": { \"$ref\": \"#/definitions/Author\" } }\r\n```\r\n\r\n## Fix\r\n\r\nWith those three changes the schema conforms, the instance document printed beneath it validates against it unchanged, and every relation in the instance resolves:\r\n\r\n```json\r\n{\r\n  \"$schema\": \"https://json-structure.org/meta/relations/v0/#\",\r\n  \"$id\": \"https://example.com/library\",\r\n  \"$uses\": [\"JSONStructureRelations\"],\r\n  \"$root\": \"#/definitions/Library\",\r\n  \"definitions\": {\r\n    \"Library\": {\r\n      \"type\": \"object\",\r\n      \"properties\": {\r\n        \"name\": { \"type\": \"string\" },\r\n        \"authors\": {\r\n          \"type\": \"array\",\r\n          \"items\": { \"type\": { \"$ref\": \"#/definitions/Author\" } }\r\n        },\r\n        \"books\": {\r\n          \"type\": \"array\",\r\n          \"items\": { \"type\": { \"$ref\": \"#/definitions/Book\" } }\r\n        }\r\n      },\r\n      \"required\": [\"name\", \"authors\", \"books\"]\r\n    },\r\n    \"Author\": {\r\n      \"type\": \"object\",\r\n      \"properties\": {\r\n        \"id\": { \"type\": \"uuid\" },\r\n        \"name\": { \"type\": \"string\" }\r\n      },\r\n      \"required\": [\"id\", \"name\"],\r\n      \"identity\": [\"id\"]\r\n    },\r\n    \"Book\": {\r\n      \"type\": \"object\",\r\n      \"properties\": {\r\n        \"isbn\": { \"type\": \"string\" },\r\n        \"title\": { \"type\": \"string\" }\r\n      },\r\n      \"required\": [\"isbn\", \"title\"],\r\n      \"identity\": [\"isbn\"],\r\n      \"relations\": {\r\n        \"authors\": {\r\n          \"cardinality\": \"multiple\",\r\n          \"targettype\": { \"$ref\": \"#/definitions/Author\" },\r\n          \"scope\": \"#/definitions/Library/properties/authors\"\r\n        }\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n```\r\n$ json-structure-check --extended --allowimport library.struct.json\r\nSchema is valid.\r\n$ json-structure-validate --extended --allowimport library.json library.struct.json\r\nInstance is valid.\r\n```\r\n\r\n## Related\r\n\r\nEvery other schema fragment in the draft should be checked for the same three defects, since they are the kind of mistake that gets copied from section to section. The worked examples under [`samples/relations/`](https://github.com/json-structure/primer-and-samples/tree/main/samples/relations) all carry the correct `$schema` and `$uses` and can serve as a reference.\r\n",
+      "createdAt": "2026-08-05T13:38:36Z",
+      "updatedAt": "2026-08-05T13:38:36Z",
+      "closedAt": null,
       "comments": []
     }
   ],
